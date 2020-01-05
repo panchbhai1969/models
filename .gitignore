@@ -99,3 +99,7 @@ tutorials/embedding/text8
 tutorials/embedding/questions-words.txt
 
 samples/outreach/blogs/segmentation_blogpost/carvana-image-masking-challenge/
+
+
+# RATATOUILLE folder : common for every model
+research/RATATOUILLE
