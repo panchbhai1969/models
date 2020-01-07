@@ -24,7 +24,7 @@ command touch $LOG_FILE
 command touch $DUMP_FILE 
 
 # Redirecting standard output to dump file
-
+{
 
 # exec  | tee $DUMP_FILE
 exec 2>&1
@@ -46,7 +46,7 @@ command cp $LABEL_MAP_PATH "${OUTPUT_DIR}/label_map.pbtxt"
 echo "Label Map Copied" | tee -a $LOG_FILE
 
 echo "Importing Model" | tee -a $LOG_FILE
-if [ $MODEL_NUM == 1 ]
+if [ $MODEL_NUM == '1' ]
 then
     command cp -r "${DETECTION_MODELS_DIR}/faster_rcnn_resnet50_coco_2018_01_28/"*  "${MODEL_DIR}/"
 fi
@@ -57,6 +57,7 @@ echo "Model Imported Successfully." | tee -a $LOG_FILE
 echo "Copying Config File" | tee -a $LOG_FILE
 command cp $PIPELINE_CONFIG_PATH "${MODEL_DIR}/pipeline.config"
 PIPELINE_CONFIG_PATH="${MODEL_DIR}/pipeline.config"
+command sed -i "s/bhadwa/${USR_NAME}/g" "${PIPELINE_CONFIG_PATH}"
 echo "Config File Copied" | tee -a $LOG_FILE
 
 echo "Training started." | tee -a $LOG_FILE
@@ -89,4 +90,4 @@ exec 2>&4   #restore stderr
 exec 1>&3   #restore stdout
 
 
-# } | tee -a $DUMP_FILE
+} | tee -a $DUMP_FILE
