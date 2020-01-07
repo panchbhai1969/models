@@ -24,9 +24,9 @@ command touch $LOG_FILE
 command touch $DUMP_FILE 
 
 # Redirecting standard output to dump file
-{
 
-exec  | tee $DUMP_FILE
+
+# exec  | tee $DUMP_FILE
 exec 2>&1
 
 
@@ -89,4 +89,4 @@ exec 2>&4   #restore stderr
 exec 1>&3   #restore stdout
 
 
-} | tee -a $DUMP_FILE
+# } | tee -a $DUMP_FILE
