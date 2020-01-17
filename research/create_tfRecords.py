@@ -33,6 +33,7 @@ import os
 import random
 import re
 import json
+import csv
 
 import contextlib2
 from lxml import etree
@@ -44,8 +45,9 @@ from object_detection.dataset_tools import tf_record_creation_util
 from object_detection.utils import dataset_util
 from object_detection.utils import label_map_util
 flags = tf.app.flags
-flags.DEFINE_string('reports_dir', '', 'Root directory to reports.')
-flags.DEFINE_string('images_dir', '', 'Root directory to images.')
+# flags.DEFINE_string('reports_dir', '', 'Root directory to reports.')
+# flags.DEFINE_string('images_dir', '', 'Root directory to images.')
+flags.DEFINE_string('dataset_path', '', 'Path to dataset csv')
 flags.DEFINE_string('output_dir', '', 'Path to directory to output TFRecords.')
 flags.DEFINE_string('label_map_path', 'data/pet_label_map.pbtxt',
                     'Path to label map proto')
@@ -70,7 +72,7 @@ def get_class_name_from_filename(file_name):
 
 def dict_to_tf_example(data,
                        label_map_dict,
-                       image_subdirectory):
+                       img_path):
   """Convert XML derived dict to tf.Example proto.
 
   Notice that this function normalizes the bounding box coordinates provided
@@ -90,9 +92,9 @@ def dict_to_tf_example(data,
     ValueError: if the image pointed to by data['filename'] is not a valid JPEG
   """
 
-  filename = data['name'].split('-')[1]
+  # filename = data['name'].split('-')[1]
 
-  img_path = os.path.join(image_subdirectory, filename)
+  # img_path = os.path.join(image_subdirectory, filename)
   with tf.gfile.GFile(img_path, 'rb') as fid:
     encoded_png = fid.read()
   encoded_png_io = io.BytesIO(encoded_png)
@@ -105,7 +107,7 @@ def dict_to_tf_example(data,
 
   height = hi
   width = wi
-  filename = data['name'].split('-')[1]
+  filename = img_path.split('/')[-1]
   encoded_image_data = encoded_png
   image_format = image.format.encode('utf8')
   xmins = [] # List of normalized left x coordinates in bounding box (1 per box)
@@ -171,11 +173,16 @@ def create_tf_record(output_filename,
       if idx % 100 == 0:
         logging.info('On image %d of %d', idx, len(examples))
 
+      json_report = ''
+      with open(example[2]) as f:
+        json_report = json.load(f)
+      img_path = example[1]
+
       try:
         tf_example = dict_to_tf_example(
-            example,
+            json_report,
             label_map_dict,
-            image_dir)
+            img_path)
         if tf_example:
           shard_idx = idx % num_shards
           output_tfrecords[shard_idx].write(tf_example.SerializeToString())
@@ -183,21 +190,38 @@ def create_tf_record(output_filename,
         logging.warning('Invalid example: %s, ignoring.', example['image']['pathname'])
 
 
+def dataset_csv_to_example_list(dataset_path):
+  examples_list = []
+  i=0
+  with open(dataset_path) as f:
+    csv_f = csv.reader(f)
+    
+    for row in csv_f:
+      if i==0: # skipping first row
+        i = 1 
+        continue
+      examples_list.append(row)
+  return examples_list
+
 
 # TODO(derekjchow): Add test for pet/PASCAL main files.
 def main(_):
-  reports_dir = FLAGS.reports_dir
-  images_dir = FLAGS.images_dir
+  # reports_dir = FLAGS.reports_dir
+  # images_dir = FLAGS.images_dir
+  dataset_path = FLAGS.dataset_path
   label_map_dict = label_map_util.get_label_map_dict(FLAGS.label_map_path)
 
   logging.info('Reading from CBC dataset.')
   
 
-  examples_list = []
-  for report in os.listdir(reports_dir):
-      with open(os.path.join(reports_dir, report)) as json_file:
-          example = json.load(json_file)
-      examples_list.append(example)
+  examples_list = dataset_csv_to_example_list(dataset_path)
+  
+
+
+  # for report in os.listdir(reports_dir):
+  #     with open(os.path.join(reports_dir, report)) as json_file:
+  #         example = json.load(json_file)
+  #     examples_list.append(example)
 
   # Test images are not included in the downloaded data set, so we shall perform
   # our own split.
@@ -220,7 +244,7 @@ def main(_):
 
   train_output_path = os.path.join(FLAGS.output_dir, 'train.record')
   val_output_path = os.path.join(FLAGS.output_dir, 'val.record')
-
+  images_dir = ''
 
   create_tf_record(
       train_output_path,

@@ -1,10 +1,11 @@
-REPORTS_DIR=$1
-IMAGES_DIR=$2
-LABEL_MAP_PATH=$3
-MODEL_NUM=$4
-PIPELINE_CONFIG_PATH=$5
-NUM_TRAIN_STEPS=$6
-USR_NAME=$7
+# REPORTS_DIR=$1
+# IMAGES_DIR=$2
+DATASET_PATH=$1
+LABEL_MAP_PATH=$2
+MODEL_NUM=$3
+PIPELINE_CONFIG_PATH=$4
+NUM_TRAIN_STEPS=$5
+USR_NAME=$6
 NUM_SHARDS=1
 PROJECT_DIR="RATATOUILLE"
 DETECTION_MODELS_DIR="${PROJECT_DIR}/DETECTION_MODELS"
@@ -39,7 +40,7 @@ OUTPUT_DIR="${USR_DIR}/data"
 
 echo "Creating tfRecords" | tee -a $LOG_FILE
 command export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
-command python3 create_tfRecords.py --reports_dir=$REPORTS_DIR --images_dir=$IMAGES_DIR --output_dir=$OUTPUT_DIR --label_map_path=$LABEL_MAP_PATH --num_shards=$NUM_SHARDS
+command python3 create_tfRecords.py --dataset_path=$DATASET_PATH --output_dir=$OUTPUT_DIR --label_map_path=$LABEL_MAP_PATH --num_shards=$NUM_SHARDS
 echo "tfRecords Created" | tee -a $LOG_FILE
 
 command cp $LABEL_MAP_PATH "${OUTPUT_DIR}/label_map.pbtxt"
@@ -59,6 +60,8 @@ command cp $PIPELINE_CONFIG_PATH "${MODEL_DIR}/pipeline.config"
 PIPELINE_CONFIG_PATH="${MODEL_DIR}/pipeline.config"
 command sed -i "s/bhadwa/${USR_NAME}/g" "${PIPELINE_CONFIG_PATH}"
 echo "Config File Copied" | tee -a $LOG_FILE
+
+exit 0
 
 echo "Training started." | tee -a $LOG_FILE
 SAMPLE_1_OF_N_EVAL_EXAMPLES=1
