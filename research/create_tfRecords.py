@@ -44,6 +44,9 @@ import tensorflow as tf
 from object_detection.dataset_tools import tf_record_creation_util
 from object_detection.utils import dataset_util
 from object_detection.utils import label_map_util
+
+from object_detection.ratatouille_utils.parseDataset import dataset_csv_to_example_list
+
 flags = tf.app.flags
 # flags.DEFINE_string('reports_dir', '', 'Root directory to reports.')
 # flags.DEFINE_string('images_dir', '', 'Root directory to images.')
@@ -189,19 +192,6 @@ def create_tf_record(output_filename,
       except ValueError:
         logging.warning('Invalid example: %s, ignoring.', example['image']['pathname'])
 
-
-def dataset_csv_to_example_list(dataset_path):
-  examples_list = []
-  i=0
-  with open(dataset_path) as f:
-    csv_f = csv.reader(f)
-    
-    for row in csv_f:
-      if i==0: # skipping first row
-        i = 1 
-        continue
-      examples_list.append(row)
-  return examples_list
 
 
 # TODO(derekjchow): Add test for pet/PASCAL main files.
