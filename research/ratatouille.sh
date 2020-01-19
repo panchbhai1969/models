@@ -61,7 +61,6 @@ PIPELINE_CONFIG_PATH="${MODEL_DIR}/pipeline.config"
 command sed -i "s/bhadwa/${USR_NAME}/g" "${PIPELINE_CONFIG_PATH}"
 echo "Config File Copied" | tee -a $LOG_FILE
 
-exit 0
 
 echo "Training started." | tee -a $LOG_FILE
 SAMPLE_1_OF_N_EVAL_EXAMPLES=1
