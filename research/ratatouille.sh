@@ -7,9 +7,9 @@ PIPELINE_CONFIG_PATH=$4
 NUM_TRAIN_STEPS=$5
 USR_NAME=$6
 TWO_STAGE_CLASSIFICATION=$7
-NUM_SHARDS=1
-PROJECT_DIR="RATATOUILLE"
-DETECTION_MODELS_DIR="${PROJECT_DIR}/DETECTION_MODELS"
+NUM_SHARDS=$8
+PROJECT_DIR=$9
+DETECTION_MODELS_DIR=${10}
 USR_DIR="${PROJECT_DIR}/${USR_NAME}"
 
 # REMOVE THE BELOW LINE - ONLY FOR DEVELOPMENT PERIOD
@@ -65,12 +65,12 @@ echo "Config File Copied" | tee -a $LOG_FILE
 
 echo "Training started." | tee -a $LOG_FILE
 SAMPLE_1_OF_N_EVAL_EXAMPLES=1
-command python3 object_detection/model_main.py \
-    --pipeline_config_path=${PIPELINE_CONFIG_PATH} \
-    --model_dir=${TRAIN_DIR} \
-    --num_train_steps=${NUM_TRAIN_STEPS} \
-    --sample_1_of_n_eval_examples=$SAMPLE_1_OF_N_EVAL_EXAMPLES \
-    --alsologtostderr
+# command python3 object_detection/model_main.py \
+#     --pipeline_config_path=${PIPELINE_CONFIG_PATH} \
+#     --model_dir=${TRAIN_DIR} \
+#     --num_train_steps=${NUM_TRAIN_STEPS} \
+#     --sample_1_of_n_eval_examples=$SAMPLE_1_OF_N_EVAL_EXAMPLES \
+#     --alsologtostderr
 echo "Training ended." | tee -a $LOG_FILE
 
 echo "Exporting Inference Graph" | tee -a $LOG_FILE
@@ -78,11 +78,11 @@ INFERENCES_DIR="${USR_DIR}/inferences"
 command mkdir $INFERENCES_DIR
 INFERENCES_GRAPH_PATH="${INFERENCES_DIR}/inference_graph"
 command mkdir $INFERENCES_GRAPH_PATH
-command python3 object_detection/export_inference_graph.py \
-    --input_type image_tensor \
-    --pipeline_config_path $PIPELINE_CONFIG_PATH \
-    --trained_checkpoint_prefix "${TRAIN_DIR}/model.ckpt-${NUM_TRAIN_STEPS}" path/to/model.ckpt \
-    --output_directory $INFERENCE_GRAPH_PATH
+# command python3 object_detection/export_inference_graph.py \
+#     --input_type image_tensor \
+#     --pipeline_config_path $PIPELINE_CONFIG_PATH \
+#     --trained_checkpoint_prefix "${TRAIN_DIR}/model.ckpt-${NUM_TRAIN_STEPS}" path/to/model.ckpt \
+#     --output_directory $INFERENCE_GRAPH_PATH
 echo "Inference Graph Exported." | tee -a $LOG_FILE
 
 
