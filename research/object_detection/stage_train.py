@@ -30,6 +30,7 @@ import json
 #import sys
 #log = open("status.log", "a")
 #sys.stdout = log
+
 #######################################
 flags = tf.app.flags
 flags.DEFINE_string('dataset_path', '', 'Path to dataset.csv file')
